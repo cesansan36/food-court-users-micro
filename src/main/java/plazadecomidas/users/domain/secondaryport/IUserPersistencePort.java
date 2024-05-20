@@ -5,4 +5,6 @@ import plazadecomidas.users.domain.model.User;
 public interface IUserPersistencePort {
 
     User saveUser(User user);
+
+    User findById(Long id);
 }

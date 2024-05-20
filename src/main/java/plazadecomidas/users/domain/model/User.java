@@ -2,8 +2,8 @@ package plazadecomidas.users.domain.model;
 
 import plazadecomidas.users.domain.exception.EmptyFieldException;
 import plazadecomidas.users.domain.exception.FieldRuleInvalidException;
-import plazadecomidas.users.domain.utils.DomainConstants;
-import plazadecomidas.users.domain.utils.Validator;
+import plazadecomidas.users.domain.util.DomainConstants;
+import plazadecomidas.users.domain.util.Validator;
 
 import java.time.LocalDate;
 

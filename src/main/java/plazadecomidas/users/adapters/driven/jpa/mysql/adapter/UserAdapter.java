@@ -3,6 +3,7 @@ package plazadecomidas.users.adapters.driven.jpa.mysql.adapter;
 import lombok.RequiredArgsConstructor;
 import plazadecomidas.users.adapters.driven.jpa.mysql.entity.UserEntity;
 import plazadecomidas.users.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
+import plazadecomidas.users.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.users.adapters.driven.jpa.mysql.mapper.IUserEntityMapper;
 import plazadecomidas.users.adapters.driven.jpa.mysql.repository.IUserRepository;
 import plazadecomidas.users.adapters.driven.jpa.mysql.util.PersistenceConstants;
@@ -29,5 +30,16 @@ public class UserAdapter implements IUserPersistencePort {
         UserEntity userEntity = userRepository.save(userEntityMapper.userToUserEntity(user));
 
         return userEntityMapper.userEntityToUser(userEntity);
+    }
+
+    @Override
+    public User findById(Long id) {
+        Optional<UserEntity> userEntity = userRepository.findById(id);
+
+        if (userEntity.isEmpty()) {
+            throw new RegistryNotFoundException(PersistenceConstants.USER_NOT_FOUND_MESSAGE);
+        }
+
+        return userEntityMapper.userEntityToUser(userEntity.get());
     }
 }

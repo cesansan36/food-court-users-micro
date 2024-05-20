@@ -1,7 +1,7 @@
 package plazadecomidas.users.domain.model;
 
 import plazadecomidas.users.domain.exception.EmptyFieldException;
-import plazadecomidas.users.domain.utils.DomainConstants;
+import plazadecomidas.users.domain.util.DomainConstants;
 
 public class Token {
 

@@ -10,11 +10,12 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class AddOwnerUserRequest {
-    String name;
-    String lastName;
-    String documentNumber;
-    String cellPhoneNumber;
-    LocalDate birthDate;
-    String email;
-    String password;
+
+    private String name;
+    private String lastName;
+    private String documentNumber;
+    private String cellPhoneNumber;
+    private LocalDate birthDate;
+    private String email;
+    private String password;
 }

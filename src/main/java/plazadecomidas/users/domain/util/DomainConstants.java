@@ -1,4 +1,4 @@
-package plazadecomidas.users.domain.utils;
+package plazadecomidas.users.domain.util;
 
 public class DomainConstants {
 

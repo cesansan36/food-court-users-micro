@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import plazadecomidas.users.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
+import plazadecomidas.users.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.users.domain.exception.EmptyFieldException;
 import plazadecomidas.users.domain.exception.FieldRuleInvalidException;
 
@@ -27,6 +28,12 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(RegistryAlreadyExistsException.class)
     public ResponseEntity<ExceptionResponse> handleRegistryAlreadyExistsException(RegistryAlreadyExistsException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(
+                exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(RegistryNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleRegistryNotFoundException(RegistryNotFoundException exception) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(
                 exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
     }

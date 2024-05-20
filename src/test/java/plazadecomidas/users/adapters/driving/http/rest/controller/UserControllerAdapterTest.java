@@ -81,8 +81,8 @@ class UserControllerAdapterTest {
 
         mockMvc.perform(request)
                 .andDo(print())
-                .andExpect(status().isCreated());
-//                .andExpect(content().json(objectMapper.writeValueAsString(response)));
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
 
         verify(ownerUserRequestMapper, times(1)).addOwnerRequestToUser(any(AddOwnerUserRequest.class), anyLong());
         verify(userServicePort, times(1)).saveUser(any(User.class));

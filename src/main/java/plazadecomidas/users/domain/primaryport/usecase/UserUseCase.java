@@ -16,6 +16,7 @@ public class UserUseCase implements IUserServicePort {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
     public Token saveUser (User user) {
 
         User encodedPasswordUser = new User(
@@ -28,11 +29,17 @@ public class UserUseCase implements IUserServicePort {
                 user.getEmail(),
                 passwordEncoder.encode(user.getPassword()),
                 user.getRole()
-                );
+        );
 
         User savedUser = userPersistencePort.saveUser(encodedPasswordUser);
 
         String token =  "TODO: Unimplemented token - " + savedUser.getName();  // TODO Token will be implemented in future user story
         return new Token(token);
+    }
+
+    @Override
+    public boolean validateRole (Long id, String role) {
+        User user = userPersistencePort.findById(id);
+        return user.getRole().getName().equals(role);
     }
 }
