@@ -19,7 +19,6 @@ public class User {
     private final String password;
     private final Role role;
 
-
     public User(Long id, String name, String lastName, String documentNumber, String cellPhoneNumber, LocalDate birthDate, String email, String password, Role role) {
 
         validateData(name, lastName, documentNumber, cellPhoneNumber, birthDate, email, password, role);

@@ -20,8 +20,8 @@ public class BeanConfiguration {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    public IUserServicePort userServicePort() {
-        return new UserUseCase(userPersistencePort(), passwordEncoder);
+    public IUserServicePort userServicePort(IUserPersistencePort userPersistencePort) {
+        return new UserUseCase(userPersistencePort, passwordEncoder);
     }
 
     @Bean
