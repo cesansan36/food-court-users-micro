@@ -1,10 +1,11 @@
 package plazadecomidas.users.adapters.driving.http.rest.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -20,14 +21,15 @@ import plazadecomidas.users.domain.primaryport.IUserServicePort;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,7 +55,7 @@ class UserControllerAdapterTest {
     }
 
     @Test
-    @DisplayName("addOwnerUser")
+    @DisplayName("Add Owner User")
     void addOwnerUser() throws Exception {
 
         Object inputObject = new Object() {
@@ -87,5 +89,27 @@ class UserControllerAdapterTest {
         verify(ownerUserRequestMapper, times(1)).addOwnerRequestToUser(any(AddOwnerUserRequest.class), anyLong());
         verify(userServicePort, times(1)).saveUser(any(User.class));
         verify(userCreatedResponseMapper, times(1)).toUserCreatedResponse(any(Token.class));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Verify Role")
+    @CsvSource({
+            "1, OWNER, true",
+            "2, CUSTOMER, false"
+    })
+    void verifyRole(Long id, String role, boolean expected) throws Exception {
+
+        when(userServicePort.validateRole(anyLong(), anyString())).thenReturn(expected);
+
+        String url = String.format("/users/user/verify-role?id=%s&role=%s", id, role);
+
+        MockHttpServletRequestBuilder request = get(url);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(String.valueOf(expected)));
+
+        verify(userServicePort, times(1)).validateRole(anyLong(), anyString());
     }
 }

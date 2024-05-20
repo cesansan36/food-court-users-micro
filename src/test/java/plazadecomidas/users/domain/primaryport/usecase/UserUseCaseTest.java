@@ -10,6 +10,7 @@ import plazadecomidas.users.domain.secondaryport.IUserPersistencePort;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -43,5 +44,15 @@ class UserUseCaseTest {
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(userPersistencePort, times(1)).saveUser(any(User.class));
         assertNotNull(token);
+    }
+
+    @Test
+    void validateRole() {
+        User user = DomainTestData.getValidUser(1L);
+        when(userPersistencePort.findById(anyLong())).thenReturn(user);
+        boolean result = userUseCase.validateRole(user.getId(), user.getRole().getName());
+
+        verify(userPersistencePort, times(1)).findById(anyLong());
+        assertTrue(result);
     }
 }

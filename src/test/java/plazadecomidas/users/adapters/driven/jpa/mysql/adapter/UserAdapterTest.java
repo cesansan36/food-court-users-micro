@@ -7,6 +7,7 @@ import plazadecomidas.users.TestData.DomainTestData;
 import plazadecomidas.users.TestData.PersistenceTestData;
 import plazadecomidas.users.adapters.driven.jpa.mysql.entity.UserEntity;
 import plazadecomidas.users.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
+import plazadecomidas.users.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.users.adapters.driven.jpa.mysql.mapper.IUserEntityMapper;
 import plazadecomidas.users.adapters.driven.jpa.mysql.repository.IUserRepository;
 import plazadecomidas.users.domain.model.User;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -79,5 +81,39 @@ class UserAdapterTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
 
         assertThrows(RegistryAlreadyExistsException.class, () -> userAdapter.saveUser(user));
+    }
+
+    @Test
+    @DisplayName("Should find user by id")
+    void shouldFindUserById() {
+        UserEntity userEntity = PersistenceTestData.getValidUserEntity(1L);
+        User user = DomainTestData.getValidUser(1L);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(userEntity));
+        when(userEntityMapper.userEntityToUser(any(UserEntity.class))).thenReturn(user);
+
+        assertAll(
+                () -> assertNotNull(userAdapter.findById(1L)),
+                () -> assertEquals(userEntity.getId(), user.getId()),
+                () -> assertEquals(userEntity.getName(), user.getName()),
+                () -> assertEquals(userEntity.getLastName(), user.getLastName()),
+                () -> assertEquals(userEntity.getDocumentNumber(), user.getDocumentNumber()),
+                () -> assertEquals(userEntity.getCellPhoneNumber(), user.getCellPhoneNumber()),
+                () -> assertEquals(userEntity.getBirthDate(), user.getBirthDate()),
+                () -> assertEquals(userEntity.getEmail(), user.getEmail()),
+                () -> assertEquals(userEntity.getPassword(), user.getPassword()),
+                () -> assertEquals(userEntity.getRoleEntity().getId(), user.getRole().getId()),
+                () -> assertEquals(userEntity.getRoleEntity().getName(), user.getRole().getName()),
+                () -> assertEquals(userEntity.getRoleEntity().getDescription(), user.getRole().getDescription()),
+                () -> verify(userRepository, times(1)).findById(anyLong()),
+                () -> verify(userEntityMapper, times(1)).userEntityToUser(any(UserEntity.class))
+        );
+    }
+
+    @Test
+    @DisplayName("Should fail on not user found")
+    void shouldFailOnNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(RegistryNotFoundException.class, () -> userAdapter.findById(1L));
     }
 }

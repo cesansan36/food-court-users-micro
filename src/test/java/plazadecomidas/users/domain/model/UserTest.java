@@ -138,7 +138,9 @@ class UserTest {
                 Arguments.of("Roberto", "Hongo", null, "+123456789", LocalDate.of(1994, 11, 15), "somemail@example.com", "123456", DomainTestData.getValidRole()),
                 Arguments.of("Roberto", "Hongo", "123456789", null, LocalDate.of(1994, 11, 15), "somemail@example.com", "123456", DomainTestData.getValidRole()),
                 Arguments.of("Roberto", "Hongo", "123456789", "123456789", LocalDate.of(1994, 11, 15), null, "123456", DomainTestData.getValidRole()),
-                Arguments.of("Roberto", "Hongo", "123456789", "+123456789", LocalDate.of(1994, 11, 15), "somemail@example.com", null, DomainTestData.getValidRole())
+                Arguments.of("Roberto", "Hongo", "123456789", "+123456789", LocalDate.of(1994, 11, 15), "somemail@example.com", null, DomainTestData.getValidRole()),
+                Arguments.of("Roberto", "Hongo", "123456789", "+123456789", LocalDate.of(1994, 11, 15), "somemail@example.com", "123456", null),
+                Arguments.of("Roberto", "Hongo", "123456789", "+123456789", null, "somemail@example.com", "123456", DomainTestData.getValidRole())
         );
     }
 
