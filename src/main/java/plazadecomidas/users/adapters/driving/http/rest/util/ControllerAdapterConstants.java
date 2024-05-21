@@ -7,4 +7,6 @@ public class ControllerAdapterConstants {
     public static final Long ADMIN_ROLE_ID = 1L;
     public static final Long OWNER_ROLE_ID = 2L;
     public static final Long EMPLOYEE_ROLE_ID = 3L;
+
+    public static final String ROLE_MISMATCH_MESSAGE = "The role id you are trying to use is not valid for this module";
 }

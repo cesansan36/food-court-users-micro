@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddEmployeeUserRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddOwnerUserRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.LogInRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.LogInResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserCreatedResponse;
+import plazadecomidas.users.adapters.driving.http.rest.exception.RoleMismatchException;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.IEmployeeUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
@@ -28,6 +31,7 @@ public class UserControllerAdapter {
 
     private final IUserServicePort userServicePort;
     private final IOwnerUserRequestMapper ownerUserRequestMapper;
+    private final IEmployeeUserRequestMapper employeeUserRequestMapper;
     private final IUserCreatedResponseMapper userCreatedResponseMapper;
     private final ILogInRequestMapper logInRequestMapper;
     private final ILogInResponseMapper logInResponseMapper;
@@ -39,6 +43,21 @@ public class UserControllerAdapter {
         UserCreatedResponse response = userCreatedResponseMapper.toUserCreatedResponse(
                                         userServicePort.saveUser(
                                                 ownerUserRequestMapper.addOwnerRequestToUser(request, ControllerAdapterConstants.OWNER_ROLE_ID)));
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("register/employee")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<UserCreatedResponse> addEmployeeUser(@RequestBody AddEmployeeUserRequest request) {
+
+        if (!ControllerAdapterConstants.EMPLOYEE_ROLE_ID.equals(request.roleId())) {
+            throw new RoleMismatchException(ControllerAdapterConstants.ROLE_MISMATCH_MESSAGE);
+        }
+
+        UserCreatedResponse response = userCreatedResponseMapper.toUserCreatedResponse(
+                                        userServicePort.saveUser(
+                                                employeeUserRequestMapper.addEmployeeRequestToUser(request)));
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
