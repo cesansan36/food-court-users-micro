@@ -5,7 +5,9 @@ import plazadecomidas.users.adapters.driven.jpa.mysql.entity.RoleEntity;
 import plazadecomidas.users.domain.model.Role;
 
 @Mapper(componentModel = "spring")
-public interface IRoleEntityMaper {
+public interface IRoleEntityMapper {
 
     public RoleEntity roleToRoleEntity(Role role);
+
+    public Role roleEntityToRole(RoleEntity roleEntity);
 }

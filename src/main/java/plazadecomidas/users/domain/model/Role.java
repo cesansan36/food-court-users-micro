@@ -23,4 +23,13 @@ public class Role {
     public String getDescription() {
         return description;
     }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

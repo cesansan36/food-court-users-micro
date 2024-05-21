@@ -19,7 +19,6 @@ import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapp
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.util.ControllerAdapterConstants;
-import plazadecomidas.users.domain.model.User;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
 
 @RestController

@@ -80,4 +80,9 @@ public class UserDetailServ implements UserDetailsService, IUserAuthentication {
     public String login(plazadecomidas.users.domain.model.User user) {
         return logInUser(user.getEmail(), user.getPassword());
     }
+
+    @Override
+    public String createToken(plazadecomidas.users.domain.model.User savedUser) {
+        return createUser(savedUser.getEmail(), savedUser.getPassword(), savedUser.getRole().getName());
+    }
 }

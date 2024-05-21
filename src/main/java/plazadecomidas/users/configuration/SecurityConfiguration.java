@@ -23,8 +23,6 @@ import plazadecomidas.users.util.JwtUtils;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
-//    private final OncePerRequestFilter jwtFilter;
-
     private static final String[] AUTH_WHITELIST = {
         "/users*/**",
         "/v2/api-docs",

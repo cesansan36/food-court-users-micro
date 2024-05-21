@@ -35,7 +35,7 @@ public class JwtUtils implements ITokenUtils {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        String jwtToken = JWT.create()
+        return JWT.create()
                 .withIssuer(this.userGenerator)
                 .withSubject(username)
                 .withClaim("authorities", authorities)
@@ -44,7 +44,6 @@ public class JwtUtils implements ITokenUtils {
                 .withJWTId(UUID.randomUUID().toString())
                 .withNotBefore(new Date(System.currentTimeMillis()))
                 .sign(algorithm);
-        return jwtToken;
     }
 
     @Override
@@ -56,8 +55,7 @@ public class JwtUtils implements ITokenUtils {
                     .withIssuer(this.userGenerator)
                     .build();
 
-            DecodedJWT decodedJWT = verifier.verify(token);
-            return decodedJWT;
+            return verifier.verify(token);
         } catch (JWTVerificationException exception) {
             throw new JWTVerificationException("Token invalid, not Authorized");
         }
