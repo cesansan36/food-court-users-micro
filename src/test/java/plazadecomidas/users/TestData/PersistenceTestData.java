@@ -11,7 +11,6 @@ import static plazadecomidas.users.TestData.DomainTestData.EMAIL_FIELD;
 import static plazadecomidas.users.TestData.DomainTestData.LAST_NAME_FIELD;
 import static plazadecomidas.users.TestData.DomainTestData.NAME_FIELD;
 import static plazadecomidas.users.TestData.DomainTestData.PASSWORD_FIELD;
-import static plazadecomidas.users.TestData.DomainTestData.getValidRole;
 
 public class PersistenceTestData {
 

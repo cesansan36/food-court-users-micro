@@ -3,7 +3,8 @@ package plazadecomidas.users.domain.model;
 import org.junit.jupiter.api.Test;
 import plazadecomidas.users.domain.exception.EmptyFieldException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TokenTest {
 
