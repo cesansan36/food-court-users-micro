@@ -14,9 +14,12 @@ import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddOwnerUserR
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.LogInRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.LogInResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserCreatedResponse;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInRequestMapper;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.util.ControllerAdapterConstants;
+import plazadecomidas.users.domain.model.User;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
 
 @RestController
@@ -27,6 +30,8 @@ public class UserControllerAdapter {
     private final IUserServicePort userServicePort;
     private final IOwnerUserRequestMapper ownerUserRequestMapper;
     private final IUserCreatedResponseMapper userCreatedResponseMapper;
+    private final ILogInRequestMapper logInRequestMapper;
+    private final ILogInResponseMapper logInResponseMapper;
 
     @PostMapping("/register/owner")
     @PreAuthorize("hasRole('ADMIN')")
@@ -39,9 +44,14 @@ public class UserControllerAdapter {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("login")
+    @PostMapping("loginUser")
     public ResponseEntity<LogInResponse> login(@RequestBody LogInRequest request) {
-        return ResponseEntity.ok(new LogInResponse("token"));
+
+        LogInResponse response = logInResponseMapper.toLogInResponse(
+                                    userServicePort.login(
+                                            logInRequestMapper.logInRequestToUser(request)));
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("user/verify-role")

@@ -4,16 +4,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import plazadecomidas.users.domain.model.Token;
 import plazadecomidas.users.domain.model.User;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
+import plazadecomidas.users.domain.secondaryport.IUserAuthentication;
 import plazadecomidas.users.domain.secondaryport.IUserPersistencePort;
 
 public class UserUseCase implements IUserServicePort {
 
     private final IUserPersistencePort userPersistencePort;
     private final PasswordEncoder passwordEncoder;
+    private final IUserAuthentication userAuthentication;
 
-    public UserUseCase(IUserPersistencePort userPersistencePort, PasswordEncoder passwordEncoder) {
+    public UserUseCase(IUserPersistencePort userPersistencePort, PasswordEncoder passwordEncoder, IUserAuthentication userAuthentication) {
         this.userPersistencePort = userPersistencePort;
         this.passwordEncoder = passwordEncoder;
+        this.userAuthentication = userAuthentication;
     }
 
     @Override
@@ -41,5 +44,13 @@ public class UserUseCase implements IUserServicePort {
     public boolean validateRole (Long id, String role) {
         User user = userPersistencePort.findById(id);
         return user.getRole().getName().equals(role);
+    }
+
+    @Override
+    public Token login(User user) {
+
+        String token = userAuthentication.login(user);
+
+        return new Token(token);
     }
 }
