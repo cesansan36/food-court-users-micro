@@ -95,28 +95,66 @@ class UserAdapterTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(userEntity));
         when(userEntityMapper.userEntityToUser(any(UserEntity.class))).thenReturn(user);
 
+        User foundUser = userAdapter.findById(1L);
+
         assertAll(
-                () -> assertNotNull(userAdapter.findById(1L)),
-                () -> assertEquals(userEntity.getId(), user.getId()),
-                () -> assertEquals(userEntity.getName(), user.getName()),
-                () -> assertEquals(userEntity.getLastName(), user.getLastName()),
-                () -> assertEquals(userEntity.getDocumentNumber(), user.getDocumentNumber()),
-                () -> assertEquals(userEntity.getCellPhoneNumber(), user.getCellPhoneNumber()),
-                () -> assertEquals(userEntity.getBirthDate(), user.getBirthDate()),
-                () -> assertEquals(userEntity.getEmail(), user.getEmail()),
-                () -> assertEquals(userEntity.getPassword(), user.getPassword()),
-                () -> assertEquals(userEntity.getRoleEntity().getId(), user.getRole().getId()),
-                () -> assertEquals(userEntity.getRoleEntity().getName(), user.getRole().getName()),
-                () -> assertEquals(userEntity.getRoleEntity().getDescription(), user.getRole().getDescription()),
+                () -> assertNotNull(foundUser),
+                () -> assertEquals(userEntity.getId(), foundUser.getId()),
+                () -> assertEquals(userEntity.getName(), foundUser.getName()),
+                () -> assertEquals(userEntity.getLastName(), foundUser.getLastName()),
+                () -> assertEquals(userEntity.getDocumentNumber(), foundUser.getDocumentNumber()),
+                () -> assertEquals(userEntity.getCellPhoneNumber(), foundUser.getCellPhoneNumber()),
+                () -> assertEquals(userEntity.getBirthDate(), foundUser.getBirthDate()),
+                () -> assertEquals(userEntity.getEmail(), foundUser.getEmail()),
+                () -> assertEquals(userEntity.getPassword(), foundUser.getPassword()),
+                () -> assertEquals(userEntity.getRoleEntity().getId(), foundUser.getRole().getId()),
+                () -> assertEquals(userEntity.getRoleEntity().getName(), foundUser.getRole().getName()),
+                () -> assertEquals(userEntity.getRoleEntity().getDescription(), foundUser.getRole().getDescription()),
                 () -> verify(userRepository, times(1)).findById(anyLong()),
                 () -> verify(userEntityMapper, times(1)).userEntityToUser(any(UserEntity.class))
         );
     }
 
     @Test
-    @DisplayName("Should fail on not user found")
-    void shouldFailOnNotFound() {
+    @DisplayName("Should fail on not user found by id")
+    void shouldFailOnNotFoundId() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(RegistryNotFoundException.class, () -> userAdapter.findById(1L));
+    }
+
+    @Test
+    @DisplayName("Should find user by email")
+    void shouldFindUserByEmail() {
+        UserEntity userEntity = PersistenceTestData.getValidUserEntity(1L);
+        User user = DomainTestData.getValidUser(1L);
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
+        when(userEntityMapper.userEntityToUser(any(UserEntity.class))).thenReturn(user);
+
+        User foundUser = userAdapter.findByEmail("xXn8z@example.com");
+
+        assertAll(
+                () -> assertNotNull(foundUser),
+                () -> assertEquals(userEntity.getId(), foundUser.getId()),
+                () -> assertEquals(userEntity.getName(), foundUser.getName()),
+                () -> assertEquals(userEntity.getLastName(), foundUser.getLastName()),
+                () -> assertEquals(userEntity.getDocumentNumber(), foundUser.getDocumentNumber()),
+                () -> assertEquals(userEntity.getCellPhoneNumber(), foundUser.getCellPhoneNumber()),
+                () -> assertEquals(userEntity.getBirthDate(), foundUser.getBirthDate()),
+                () -> assertEquals(userEntity.getEmail(), foundUser.getEmail()),
+                () -> assertEquals(userEntity.getPassword(), foundUser.getPassword()),
+                () -> assertEquals(userEntity.getRoleEntity().getId(), foundUser.getRole().getId()),
+                () -> assertEquals(userEntity.getRoleEntity().getName(), foundUser.getRole().getName()),
+                () -> assertEquals(userEntity.getRoleEntity().getDescription(), foundUser.getRole().getDescription()),
+                () -> verify(userRepository, times(1)).findByEmail(anyString()),
+                () -> verify(userEntityMapper, times(1)).userEntityToUser(any(UserEntity.class))
+        );
+    }
+
+    @Test
+    @DisplayName("Should fail on not user found by email")
+    void shouldFailOnNotFoundEmail() {
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        assertThrows(RegistryNotFoundException.class, () -> userAdapter.findByEmail("xXn8z@example.com"));
     }
 }

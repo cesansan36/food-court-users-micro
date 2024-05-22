@@ -7,7 +7,8 @@ public class DomainConstants {
     public enum Roles {
         ADMIN(1L),
         OWNER(2L),
-        EMPLOYEE(3L);
+        EMPLOYEE(3L),
+        CLIENT(4L);
 
         private final Long id;
 

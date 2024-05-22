@@ -57,32 +57,32 @@ public class UserDetailServ implements UserDetailsService, IUserAuthentication {
         return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
     }
 
-    public String logInUser(String username, String password) {
+    public String logInUser(String username, String password, Long userId) {
 
         Authentication authentication = authenticate(username, password);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return tokenUtils.createToken(authentication);
+        return tokenUtils.createToken(authentication, userId);
     }
 
-    public String createUser(String username, String password, String role) {
+    public String createUser(String username, String password, String role, Long userId) {
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password, authorities);
 
-        return tokenUtils.createToken(authentication);
+        return tokenUtils.createToken(authentication, userId);
     }
 
     @Override
-    public String login(plazadecomidas.users.domain.model.User user) {
-        return logInUser(user.getEmail(), user.getPassword());
+    public String login(plazadecomidas.users.domain.model.User user, Long idUser) {
+        return logInUser(user.getEmail(), user.getPassword(), idUser);
     }
 
     @Override
-    public String createToken(plazadecomidas.users.domain.model.User savedUser) {
-        return createUser(savedUser.getEmail(), savedUser.getPassword(), savedUser.getRole().getName());
+    public String createToken(plazadecomidas.users.domain.model.User user) {
+        return createUser(user.getEmail(), user.getPassword(), user.getRole().getName(), user.getId());
     }
 }

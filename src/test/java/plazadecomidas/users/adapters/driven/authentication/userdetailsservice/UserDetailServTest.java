@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -102,30 +103,30 @@ class UserDetailServTest {
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
-        when(tokenUtils.createToken(any(Authentication.class))).thenReturn(token);
+        when(tokenUtils.createToken(any(Authentication.class), anyLong())).thenReturn(token);
 
-        String result = userDetailServ.logInUser("user1", "12341");
+        String result = userDetailServ.logInUser("user1", "12341", 1L);
 
         assertNotNull(result);
         assertEquals(token, result);
 
         verify(userRepository, times(1)).findByEmail("user1");
         verify(passwordEncoder, times(1)).matches("12341", userEntity.getPassword());
-        verify(tokenUtils, times(1)).createToken(any(Authentication.class));
+        verify(tokenUtils, times(1)).createToken(any(Authentication.class), anyLong());
     }
 
     @Test
     void createUser() {
         String token = "token";
 
-        when(tokenUtils.createToken(any(Authentication.class))).thenReturn(token);
+        when(tokenUtils.createToken(any(Authentication.class), anyLong())).thenReturn(token);
 
-        String result = userDetailServ.createUser("user1", "12341", "ROLE_ADMIN");
+        String result = userDetailServ.createUser("user1", "12341", "ROLE_ADMIN", 1L);
 
         assertNotNull(result);
         assertEquals(token, result);
 
-        verify(tokenUtils, times(1)).createToken(any(Authentication.class));
+        verify(tokenUtils, times(1)).createToken(any(Authentication.class), anyLong());
     }
 
     @Test
@@ -136,29 +137,29 @@ class UserDetailServTest {
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
-        when(tokenUtils.createToken(any(Authentication.class))).thenReturn(token);
+        when(tokenUtils.createToken(any(Authentication.class), anyLong())).thenReturn(token);
 
-        String result = userDetailServ.login(user);
+        String result = userDetailServ.login(user, 1L);
 
         assertNotNull(result);
         assertEquals(token, result);
 
         verify(userRepository, times(1)).findByEmail("email1@example.com");
         verify(passwordEncoder, times(1)).matches("12341", userEntity.getPassword());
-        verify(tokenUtils, times(1)).createToken(any(Authentication.class));
+        verify(tokenUtils, times(1)).createToken(any(Authentication.class), anyLong());
     }
 
     @Test
     void createToken() {
         String token = "token";
 
-        when(tokenUtils.createToken(any(Authentication.class))).thenReturn(token);
+        when(tokenUtils.createToken(any(Authentication.class), anyLong())).thenReturn(token);
 
         String result = userDetailServ.createToken(DomainTestData.getValidUser(1L));
 
         assertNotNull(result);
         assertEquals(token, result);
 
-        verify(tokenUtils, times(1)).createToken(any(Authentication.class));
+        verify(tokenUtils, times(1)).createToken(any(Authentication.class), anyLong());
     }
 }

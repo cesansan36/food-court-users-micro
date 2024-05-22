@@ -42,4 +42,15 @@ public class UserAdapter implements IUserPersistencePort {
 
         return userEntityMapper.userEntityToUser(userEntity.get());
     }
+
+    @Override
+    public User findByEmail(String email) {
+        Optional<UserEntity> userEntity = userRepository.findByEmail(email);
+
+        if (userEntity.isEmpty()) {
+            throw new RegistryNotFoundException(PersistenceConstants.USER_NOT_FOUND_MESSAGE);
+        }
+
+        return userEntityMapper.userEntityToUser(userEntity.get());
+    }
 }

@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 
 public interface ITokenUtils {
 
-    String createToken(Authentication authentication);
+    String createToken(Authentication authentication, Long userId);
 
     DecodedJWT validateToken(String token);
     String extractUsername(DecodedJWT decodedJWT);

@@ -76,11 +76,12 @@ class UserUseCaseTest {
         User user = DomainTestData.getValidUser(1L);
         String tokenString = "token";
 
-        when(userAuthentication.login(any(User.class))).thenReturn(tokenString);
+        when(userPersistencePort.findByEmail(anyString())).thenReturn(user);
+        when(userAuthentication.login(any(User.class), anyLong())).thenReturn(tokenString);
 
         Token token = userUseCase.login(user);
 
-        verify(userAuthentication, times(1)).login(any(User.class));
+        verify(userAuthentication, times(1)).login(any(User.class), anyLong());
         assertNotNull(token);
         assertEquals(tokenString, token.getValue());
     }

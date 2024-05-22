@@ -24,7 +24,7 @@ import plazadecomidas.users.util.JwtUtils;
 public class SecurityConfiguration {
 
     private static final String[] AUTH_WHITELIST = {
-        "/users*/**",
+        "/users/**",
         "/v2/api-docs",
         "/v2/api-docs/**",
         "/v3/api-docs",

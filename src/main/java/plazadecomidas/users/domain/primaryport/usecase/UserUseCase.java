@@ -55,7 +55,9 @@ public class UserUseCase implements IUserServicePort {
     @Override
     public Token login(User user) {
 
-        String token = userAuthentication.login(user);
+        User userFound = userPersistencePort.findByEmail(user.getEmail());
+
+        String token = userAuthentication.login(user, userFound.getId());
 
         return new Token(token);
     }
