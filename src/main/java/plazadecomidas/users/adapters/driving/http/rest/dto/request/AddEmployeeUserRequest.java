@@ -10,5 +10,6 @@ public record AddEmployeeUserRequest(
     LocalDate birthDate,
     String email,
     String password,
-    Long roleId
+    Long roleId,
+    Long restaurantId
 ) {}

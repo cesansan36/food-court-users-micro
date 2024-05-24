@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestM
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.util.ControllerAdapterConstants;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
+import plazadecomidas.users.util.ITokenUtils;
 
 @RestController
 @RequestMapping("/users")
@@ -38,6 +40,7 @@ public class UserControllerAdapter {
     private final IUserCreatedResponseMapper userCreatedResponseMapper;
     private final ILogInRequestMapper logInRequestMapper;
     private final ILogInResponseMapper logInResponseMapper;
+    private final ITokenUtils tokenUtils;
 
     @PostMapping("/register/owner")
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,15 +55,17 @@ public class UserControllerAdapter {
 
     @PostMapping("register/employee")
     @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<UserCreatedResponse> addEmployeeUser(@RequestBody AddEmployeeUserRequest request) {
+    public ResponseEntity<UserCreatedResponse> addEmployeeUser(@RequestHeader(value = "Authorization") String token, @RequestBody AddEmployeeUserRequest request) {
 
         if (!ControllerAdapterConstants.EMPLOYEE_ROLE_ID.equals(request.roleId())) {
             throw new RoleMismatchException(ControllerAdapterConstants.ROLE_MISMATCH_MESSAGE);
         }
 
+        Long ownerId = extractToken(token);
+
         UserCreatedResponse response = userCreatedResponseMapper.toUserCreatedResponse(
                                         userServicePort.saveUser(
-                                                employeeUserRequestMapper.addEmployeeRequestToUser(request)));
+                                                employeeUserRequestMapper.addEmployeeRequestToUser(request), token, ownerId, request.restaurantId()));
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -93,5 +98,10 @@ public class UserControllerAdapter {
     public ResponseEntity<Boolean> verifyRole(@RequestParam Long id, @RequestParam String role) {
         boolean isValidRole = userServicePort.validateRole(id, role);
         return ResponseEntity.ok(isValidRole);
+    }
+
+    private Long extractToken(String token) {
+        String jwt = token.substring(7);
+        return tokenUtils.getSpecificClaim(tokenUtils.validateToken(jwt), ControllerAdapterConstants.USER_CLAIM).asLong();
     }
 }
