@@ -8,6 +8,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserCreatedResponse {
-
     private String token;
 }

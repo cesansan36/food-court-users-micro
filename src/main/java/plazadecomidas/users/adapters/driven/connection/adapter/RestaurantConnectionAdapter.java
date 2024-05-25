@@ -1,9 +1,11 @@
 package plazadecomidas.users.adapters.driven.connection.adapter;
 
 import lombok.AllArgsConstructor;
+import plazadecomidas.users.adapters.driven.connection.exception.MicroserviceFailedInteractionException;
 import plazadecomidas.users.adapters.driven.connection.feign.IEmployeeFeignClient;
 import plazadecomidas.users.adapters.driven.connection.mapper.IEmployeeRequestMapper;
 import plazadecomidas.users.adapters.driven.connection.request.AddEmployeeRequest;
+import plazadecomidas.users.adapters.driven.connection.util.ConnectionConstants;
 import plazadecomidas.users.domain.secondaryport.IRestaurantConnectionPort;
 
 @AllArgsConstructor
@@ -18,10 +20,10 @@ public class RestaurantConnectionAdapter implements IRestaurantConnectionPort {
 
         try {
             employeeFeignClient.registerEmployee(ownerToken, employee);
-            System.out.println("Si se pudo");
         } catch (Exception e) {
-            System.out.println("No se pudo");
-            e.printStackTrace();
+            throw new MicroserviceFailedInteractionException(
+                    ConnectionConstants.FAILED_EMPLOYEE_RESTAURANT_LINK.formatted(
+                            e.getMessage()));
         }
     }
 }

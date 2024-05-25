@@ -27,7 +27,7 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
-    public Token saveUser (User user) {
+    public Token saveUser(User user) {
         Role role = rolePersistencePort.findById(user.getRole().getId());
 
         User encodedPasswordUser = new User(
@@ -65,7 +65,7 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
-    public Token saveUser(User user, String ownerToken, Long ownerId, Long restaurantId) {
+    public Token saveUserInBothServices(User user, String ownerToken, Long ownerId, Long restaurantId) {
         Role role = rolePersistencePort.findById(user.getRole().getId());
 
         User encodedPasswordUser = new User(
@@ -83,8 +83,6 @@ public class UserUseCase implements IUserServicePort {
         User savedUser = userPersistencePort.saveUser(encodedPasswordUser);
 
         restaurantConnectionPort.saveUser(ownerToken, ownerId, savedUser.getId(), restaurantId);
-
-        // TODO send user to restaurant microservice
 
         String token = userAuthentication.createToken(savedUser);
         return new Token(token);

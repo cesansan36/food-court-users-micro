@@ -1,5 +1,7 @@
 package plazadecomidas.users.adapters.driving.http.rest.controller;
 
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import plazadecomidas.users.TestData.ControllerTestData;
 import plazadecomidas.users.TestData.DomainTestData;
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddClientRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddEmployeeUserRequest;
@@ -29,6 +32,7 @@ import plazadecomidas.users.configuration.exceptionhandler.ControllerAdvisor;
 import plazadecomidas.users.domain.model.Token;
 import plazadecomidas.users.domain.model.User;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
+import plazadecomidas.users.util.ITokenUtils;
 
 import java.time.LocalDate;
 
@@ -57,6 +61,7 @@ class UserControllerAdapterTest {
     private IUserCreatedResponseMapper userCreatedResponseMapper;
     private ILogInRequestMapper logInRequestMapper;
     private ILogInResponseMapper logInResponseMapper;
+    private ITokenUtils tokenUtils;
 
     private MockMvc mockMvc;
 
@@ -69,7 +74,8 @@ class UserControllerAdapterTest {
         userCreatedResponseMapper = mock(IUserCreatedResponseMapper.class);
         logInRequestMapper = mock(ILogInRequestMapper.class);
         logInResponseMapper = mock(ILogInResponseMapper.class);
-        userControllerAdapter = new UserControllerAdapter(userServicePort, ownerUserRequestMapper, employeeUserRequestMapper, clientUserRequestMapper, userCreatedResponseMapper, logInRequestMapper, logInResponseMapper);
+        tokenUtils = mock(ITokenUtils.class);
+        userControllerAdapter = new UserControllerAdapter(userServicePort, ownerUserRequestMapper, employeeUserRequestMapper, clientUserRequestMapper, userCreatedResponseMapper, logInRequestMapper, logInResponseMapper, tokenUtils);
 
         mockMvc = MockMvcBuilders.standaloneSetup(userControllerAdapter).setControllerAdvice(new ControllerAdvisor()).build();
     }
@@ -124,20 +130,29 @@ class UserControllerAdapterTest {
             public final String email = "somemail@example.com";
             public final String password = "1234";
             public final Long roleId = 3L;
+            public final Long restaurantId = 2L;
         };
         ObjectMapper objectMapper = new ObjectMapper();
         String inputJson = objectMapper.writeValueAsString(inputObject);
 
         Token token = new Token("token");
         UserCreatedResponse response = new UserCreatedResponse("token");
+        String headerToken = "Bearer token";
+        Claim claim = ControllerTestData.getIdClaim(1L);
 
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
         when(employeeUserRequestMapper.addEmployeeRequestToUser(any(AddEmployeeUserRequest.class))).thenReturn(DomainTestData.getValidUser(1L));
-        when(userServicePort.saveUser(any(User.class))).thenReturn(token);
+        when(userServicePort.saveUserInBothServices(any(User.class), anyString(), anyLong(), anyLong())).thenReturn(token);
         when(userCreatedResponseMapper.toUserCreatedResponse(any(Token.class))).thenReturn(response);
 
         MockHttpServletRequestBuilder request = post("/users/register/employee")
+                .header("Authorization", headerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(inputJson);
+
+        System.out.println("El token está bien =================");
+        System.out.println(objectMapper.writeValueAsString(response));
 
         mockMvc.perform(request)
                 .andDo(print())
@@ -145,7 +160,7 @@ class UserControllerAdapterTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(response)));
 
         verify(employeeUserRequestMapper, times(1)).addEmployeeRequestToUser(any(AddEmployeeUserRequest.class));
-        verify(userServicePort, times(1)).saveUser(any(User.class));
+        verify(userServicePort, times(1)).saveUserInBothServices(any(User.class), anyString(), anyLong(), anyLong());
         verify(userCreatedResponseMapper, times(1)).toUserCreatedResponse(any(Token.class));
     }
 
@@ -167,7 +182,10 @@ class UserControllerAdapterTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String inputJson = objectMapper.writeValueAsString(inputObject);
 
+        String bearerToken = "Bearer token";
+
         MockHttpServletRequestBuilder request = post("/users/register/employee")
+                .header("Authorization", bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(inputJson);
 

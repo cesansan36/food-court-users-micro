@@ -7,6 +7,7 @@ import plazadecomidas.users.TestData.DomainTestData;
 import plazadecomidas.users.domain.model.Role;
 import plazadecomidas.users.domain.model.Token;
 import plazadecomidas.users.domain.model.User;
+import plazadecomidas.users.domain.secondaryport.IRestaurantConnectionPort;
 import plazadecomidas.users.domain.secondaryport.IRolePersistencePort;
 import plazadecomidas.users.domain.secondaryport.IUserAuthentication;
 import plazadecomidas.users.domain.secondaryport.IUserPersistencePort;
@@ -30,6 +31,7 @@ class UserUseCaseTest {
     private IRolePersistencePort rolePersistencePort;
     private PasswordEncoder passwordEncoder;
     private IUserAuthentication userAuthentication;
+    private IRestaurantConnectionPort restaurantConnectionPort;
 
     @BeforeEach
     void setUp() {
@@ -37,7 +39,8 @@ class UserUseCaseTest {
         rolePersistencePort = mock(IRolePersistencePort.class);
         passwordEncoder = mock(PasswordEncoder.class);
         userAuthentication = mock(IUserAuthentication.class);
-        userUseCase = new UserUseCase(userPersistencePort, rolePersistencePort, passwordEncoder, userAuthentication);
+        restaurantConnectionPort = mock(IRestaurantConnectionPort.class);
+        userUseCase = new UserUseCase(userPersistencePort, rolePersistencePort, passwordEncoder, userAuthentication, restaurantConnectionPort);
     }
 
     @Test
@@ -84,5 +87,27 @@ class UserUseCaseTest {
         verify(userAuthentication, times(1)).login(any(User.class), anyLong());
         assertNotNull(token);
         assertEquals(tokenString, token.getValue());
+    }
+
+    @Test
+    void saveUserInBothServices() {
+        String encodedPassword = "password";
+        User user = DomainTestData.getValidUser(1L);
+        Role role = DomainTestData.getValidRole();
+        String ownerToken = "ownerToken";
+        String tokenString = "token";
+
+        when(rolePersistencePort.findById(anyLong())).thenReturn(role);
+        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
+        when(userPersistencePort.saveUser(any(User.class))).thenReturn(user);
+        when(userAuthentication.createToken(any(User.class))).thenReturn(tokenString);
+
+        Token token = userUseCase.saveUserInBothServices(user, ownerToken, 1L, 1L);
+
+        verify(passwordEncoder, times(1)).encode(anyString());
+        verify(userPersistencePort, times(1)).saveUser(any(User.class));
+        verify(rolePersistencePort, times(1)).findById(anyLong());
+        verify(userAuthentication, times(1)).createToken(any(User.class));
+        assertNotNull(token);
     }
 }

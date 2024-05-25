@@ -60,11 +60,10 @@ public class UserControllerAdapter {
         if (!ControllerAdapterConstants.EMPLOYEE_ROLE_ID.equals(request.roleId())) {
             throw new RoleMismatchException(ControllerAdapterConstants.ROLE_MISMATCH_MESSAGE);
         }
-
         Long ownerId = extractToken(token);
 
         UserCreatedResponse response = userCreatedResponseMapper.toUserCreatedResponse(
-                                        userServicePort.saveUser(
+                                        userServicePort.saveUserInBothServices(
                                                 employeeUserRequestMapper.addEmployeeRequestToUser(request), token, ownerId, request.restaurantId()));
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
