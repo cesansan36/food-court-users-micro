@@ -17,6 +17,7 @@ import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddOwnerUserR
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.LogInRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.LogInResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserCreatedResponse;
+import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserPhoneResponse;
 import plazadecomidas.users.adapters.driving.http.rest.exception.RoleMismatchException;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IClientUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IEmployeeUserRequestMapper;
@@ -24,6 +25,7 @@ import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInRequestMappe
 import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserPhoneResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.util.ControllerAdapterConstants;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
 import plazadecomidas.users.util.ITokenUtils;
@@ -38,6 +40,7 @@ public class UserControllerAdapter {
     private final IEmployeeUserRequestMapper employeeUserRequestMapper;
     private final IClientUserRequestMapper clientUserRequestMapper;
     private final IUserCreatedResponseMapper userCreatedResponseMapper;
+    private final IUserPhoneResponseMapper userPhoneResponseMapper;
     private final ILogInRequestMapper logInRequestMapper;
     private final ILogInResponseMapper logInResponseMapper;
     private final ITokenUtils tokenUtils;
@@ -97,6 +100,15 @@ public class UserControllerAdapter {
     public ResponseEntity<Boolean> verifyRole(@RequestParam Long id, @RequestParam String role) {
         boolean isValidRole = userServicePort.validateRole(id, role);
         return ResponseEntity.ok(isValidRole);
+    }
+
+    @GetMapping("get-number")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<String> getNumber(@RequestParam Long id) {
+        UserPhoneResponse response = userPhoneResponseMapper.toUserPhoneResponse(
+                                        userServicePort.getUserPhone(id));
+
+        return ResponseEntity.ok(response.phoneNumber());
     }
 
     private Long extractToken(String token) {

@@ -13,4 +13,6 @@ public interface IUserServicePort {
     Token saveUser(User user);
 
     Token saveUserInBothServices(User user, String ownerToken, Long ownerId, Long restaurantId);
+
+    String getUserPhone(Long id);
 }

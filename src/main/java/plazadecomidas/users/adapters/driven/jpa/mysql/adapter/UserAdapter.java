@@ -53,4 +53,16 @@ public class UserAdapter implements IUserPersistencePort {
 
         return userEntityMapper.userEntityToUser(userEntity.get());
     }
+
+    @Override
+    public String getUserPhone(Long id) {
+
+        Optional<String> phoneNumber = userRepository.findCellPhoneNumberById(id);
+
+        if (phoneNumber.isEmpty()) {
+            throw new RegistryNotFoundException(PersistenceConstants.USER_NOT_FOUND_MESSAGE);
+        }
+
+        return phoneNumber.get();
+    }
 }

@@ -87,4 +87,9 @@ public class UserUseCase implements IUserServicePort {
         String token = userAuthentication.createToken(savedUser);
         return new Token(token);
     }
+
+    @Override
+    public String getUserPhone(Long id) {
+        return userPersistencePort.getUserPhone(id);
+    }
 }
