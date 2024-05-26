@@ -110,4 +110,18 @@ class UserUseCaseTest {
         verify(userAuthentication, times(1)).createToken(any(User.class));
         assertNotNull(token);
     }
+
+    @Test
+    void getUserPhone() {
+        Long id = 1L;
+        String phone = "123456789";
+
+        when(userPersistencePort.getUserPhone(anyLong())).thenReturn(phone);
+
+        String result = userUseCase.getUserPhone(id);
+
+        verify(userPersistencePort, times(1)).getUserPhone(anyLong());
+        assertEquals(phone, result);
+
+    }
 }

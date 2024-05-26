@@ -157,4 +157,25 @@ class UserAdapterTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         assertThrows(RegistryNotFoundException.class, () -> userAdapter.findByEmail("xXn8z@example.com"));
     }
+
+    @Test
+    void getUserPhoneSuccess() {
+        Long id = 1L;
+        String phone = "123456789";
+
+        when(userRepository.findCellPhoneNumberById(id)).thenReturn(Optional.of(phone));
+
+        String result = userAdapter.getUserPhone(id);
+
+        assertEquals(phone, result);
+    }
+
+    @Test
+    void getUserPhoneFail() {
+        Long id = 1L;
+
+        when(userRepository.findCellPhoneNumberById(id)).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> userAdapter.getUserPhone(id));
+    }
 }

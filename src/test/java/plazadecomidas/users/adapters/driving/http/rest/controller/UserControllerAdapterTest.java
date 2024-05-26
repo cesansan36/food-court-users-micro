@@ -21,6 +21,7 @@ import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddOwnerUserR
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.LogInRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.LogInResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserCreatedResponse;
+import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserPhoneResponse;
 import plazadecomidas.users.adapters.driving.http.rest.exception.RoleMismatchException;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IClientUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IEmployeeUserRequestMapper;
@@ -28,6 +29,7 @@ import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInRequestMappe
 import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserPhoneResponseMapper;
 import plazadecomidas.users.configuration.exceptionhandler.ControllerAdvisor;
 import plazadecomidas.users.domain.model.Token;
 import plazadecomidas.users.domain.model.User;
@@ -59,6 +61,7 @@ class UserControllerAdapterTest {
     private IEmployeeUserRequestMapper employeeUserRequestMapper;
     private IClientUserRequestMapper clientUserRequestMapper;
     private IUserCreatedResponseMapper userCreatedResponseMapper;
+    private IUserPhoneResponseMapper userPhoneResponseMapper;
     private ILogInRequestMapper logInRequestMapper;
     private ILogInResponseMapper logInResponseMapper;
     private ITokenUtils tokenUtils;
@@ -72,10 +75,12 @@ class UserControllerAdapterTest {
         employeeUserRequestMapper = mock(IEmployeeUserRequestMapper.class);
         clientUserRequestMapper = mock(IClientUserRequestMapper.class);
         userCreatedResponseMapper = mock(IUserCreatedResponseMapper.class);
+        userPhoneResponseMapper = mock(IUserPhoneResponseMapper.class);
         logInRequestMapper = mock(ILogInRequestMapper.class);
         logInResponseMapper = mock(ILogInResponseMapper.class);
         tokenUtils = mock(ITokenUtils.class);
-        userControllerAdapter = new UserControllerAdapter(userServicePort, ownerUserRequestMapper, employeeUserRequestMapper, clientUserRequestMapper, userCreatedResponseMapper, logInRequestMapper, logInResponseMapper, tokenUtils);
+
+        userControllerAdapter = new UserControllerAdapter(userServicePort, ownerUserRequestMapper, employeeUserRequestMapper, clientUserRequestMapper, userCreatedResponseMapper, userPhoneResponseMapper, logInRequestMapper, logInResponseMapper, tokenUtils);
 
         mockMvc = MockMvcBuilders.standaloneSetup(userControllerAdapter).setControllerAdvice(new ControllerAdvisor()).build();
     }
@@ -319,5 +324,27 @@ class UserControllerAdapterTest {
         verify(logInRequestMapper, times(1)).logInRequestToUser(any(LogInRequest.class));
         verify(userServicePort, times(1)).login(any(User.class));
         verify(logInResponseMapper, times(1)).toLogInResponse(any(Token.class));
+    }
+
+    @Test
+    void getNumber() throws Exception {
+        Long id = 1L;
+        UserPhoneResponse response = new UserPhoneResponse("123456789");
+        String phone = "123456789";
+
+        when(userServicePort.getUserPhone(anyLong())).thenReturn(phone);
+        when(userPhoneResponseMapper.toUserPhoneResponse(anyString())).thenReturn(response);
+
+        String url = String.format("/users/get-number?id=%s", id);
+
+        MockHttpServletRequestBuilder request = get(url);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(phone));
+
+        verify(userServicePort, times(1)).getUserPhone(anyLong());
+        verify(userPhoneResponseMapper, times(1)).toUserPhoneResponse(anyString());
     }
 }
