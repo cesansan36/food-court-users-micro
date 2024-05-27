@@ -45,6 +45,7 @@ public class UserAdapter implements IUserPersistencePort {
 
     @Override
     public User findByEmail(String email) {
+        System.out.println(3);
         Optional<UserEntity> userEntity = userRepository.findByEmail(email);
 
         if (userEntity.isEmpty()) {

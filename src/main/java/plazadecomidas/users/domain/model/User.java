@@ -43,34 +43,34 @@ public class User {
 
     private void validateData(String name, String lastName, String documentNumber, String cellPhoneNumber, LocalDate birthDate, String email, String password, Role role) {
         if (Validator.isFieldEmpty(name)) {
-            throw new EmptyFieldException(DomainConstants.Fields.NAME.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.NAME.name()));
         }
 
         if (Validator.isFieldEmpty(lastName)) {
-            throw new EmptyFieldException(DomainConstants.Fields.LAST_NAME.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.LAST_NAME.name()));
         }
 
         if (Validator.isFieldEmpty(password)) {
-            throw new EmptyFieldException(DomainConstants.Fields.PASSWORD.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.PASSWORD.name()));
         }
         if (Validator.isFieldEmpty(documentNumber)) {
-            throw new EmptyFieldException(DomainConstants.Fields.DOCUMENT_NUMBER.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.DOCUMENT_NUMBER.name()));
         }
 
         if (Validator.isFieldEmpty(cellPhoneNumber)) {
-            throw new EmptyFieldException(DomainConstants.Fields.CELL_PHONE_NUMBER.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.CELL_PHONE_NUMBER.name()));
         }
 
         if (Validator.isFieldEmpty(email)) {
-            throw new EmptyFieldException(DomainConstants.Fields.EMAIL.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.EMAIL.name()));
         }
 
         if (birthDate == null) {
-            throw new EmptyFieldException(DomainConstants.Fields.BIRTH_DATE.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.BIRTH_DATE.name()));
         }
 
         if (role == null) {
-            throw new EmptyFieldException(DomainConstants.Fields.ROLE_ID.toString());
+            throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.Fields.ROLE_ID.name()));
         }
 
         if (!Validator.isValidRole(role)) {
@@ -82,7 +82,7 @@ public class User {
         }
 
         if (!Validator.isValidPhoneNumber(cellPhoneNumber)) {
-            throw new FieldRuleInvalidException(DomainConstants.PHONE_NUMBER_CHAR_AMOUNT_EXCEEDED);
+            throw new FieldRuleInvalidException(DomainConstants.PHONE_NUMBER_NOT_VALID_MESSAGE.formatted(DomainConstants.PHONE_NUMBER_MAX_LENGTH));
         }
 
         if (!Validator.isValidEmail(email)) {
