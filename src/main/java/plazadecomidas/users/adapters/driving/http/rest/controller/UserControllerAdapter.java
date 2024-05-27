@@ -60,6 +60,7 @@ public class UserControllerAdapter {
 
     @PostMapping("register/employee")
     @PreAuthorize("hasRole('OWNER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserCreatedResponse> addEmployeeUser(@RequestHeader(value = "Authorization") String token, @RequestBody AddEmployeeUserRequest request) {
 
         if (!ControllerAdapterConstants.EMPLOYEE_ROLE_ID.equals(request.roleId())) {
@@ -106,6 +107,7 @@ public class UserControllerAdapter {
 
     @GetMapping("get-number")
     @PreAuthorize("hasRole('EMPLOYEE')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<String> getNumber(@RequestParam Long id) {
         UserPhoneResponse response = userPhoneResponseMapper.toUserPhoneResponse(
                                         userServicePort.getUserPhone(id));
