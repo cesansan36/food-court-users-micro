@@ -90,7 +90,7 @@ public class User {
         }
 
         if (!Validator.isValidAge(birthDate)) {
-            throw new FieldRuleInvalidException(DomainConstants.AGE_BELOW_MINIMUM);
+            throw new FieldRuleInvalidException(DomainConstants.AGE_BELOW_MINIMUM.formatted(DomainConstants.AGE_MINIMUM));
         }
     }
 

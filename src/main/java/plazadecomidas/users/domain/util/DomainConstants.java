@@ -50,7 +50,7 @@ public class DomainConstants {
     public static final String EMAIL_STRUCTURE_NOT_VALID = "The email field is not valid";
     public static final String PHONE_NUMBER_CHAR_AMOUNT_EXCEEDED = "The cell phone number can not have more than %s characters";
     public static final String DOCUMENT_NUMBER_SHOULD_CONTAIN_ONLY_NUMBERS = "The document number should contain only numbers";
-    public static final String AGE_BELOW_MINIMUM = "The user age should be at least %s";
+    public static final String AGE_BELOW_MINIMUM = "The user age should be at least %s years";
     public static final String ROLE_ID_NOT_VALID = "The role id is not valid";
 
 }

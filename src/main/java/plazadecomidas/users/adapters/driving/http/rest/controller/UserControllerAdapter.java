@@ -1,5 +1,6 @@
 package plazadecomidas.users.adapters.driving.http.rest.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,7 @@ public class UserControllerAdapter {
 
     @PostMapping("/register/owner")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserCreatedResponse> addOwnerUser(@RequestBody AddOwnerUserRequest request) {
 
         UserCreatedResponse response = userCreatedResponseMapper.toUserCreatedResponse(
