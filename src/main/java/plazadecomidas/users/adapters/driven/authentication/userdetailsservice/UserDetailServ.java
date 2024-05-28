@@ -46,10 +46,6 @@ public class UserDetailServ implements UserDetailsService, IUserAuthentication {
     public Authentication authenticate(String username, String password) {
         UserDetails userDetails = this.loadUserByUsername(username);
 
-        if (userDetails == null) {
-            throw new BadCredentialsException(AuthConstants.INVALID_USERNAME_OR_PASSWORD);
-        }
-
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException(AuthConstants.INVALID_USERNAME_OR_PASSWORD);
         }
