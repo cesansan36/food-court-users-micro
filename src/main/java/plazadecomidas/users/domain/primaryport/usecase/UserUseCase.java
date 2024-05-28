@@ -1,10 +1,10 @@
 package plazadecomidas.users.domain.primaryport.usecase;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import plazadecomidas.users.domain.model.Role;
 import plazadecomidas.users.domain.model.Token;
 import plazadecomidas.users.domain.model.User;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
+import plazadecomidas.users.domain.secondaryport.IPasswordEncoderPort;
 import plazadecomidas.users.domain.secondaryport.IRestaurantConnectionPort;
 import plazadecomidas.users.domain.secondaryport.IRolePersistencePort;
 import plazadecomidas.users.domain.secondaryport.IUserAuthentication;
@@ -14,14 +14,14 @@ public class UserUseCase implements IUserServicePort {
 
     private final IUserPersistencePort userPersistencePort;
     private final IRolePersistencePort rolePersistencePort;
-    private final PasswordEncoder passwordEncoder;
+    private final IPasswordEncoderPort passwordEncoderPort;
     private final IUserAuthentication userAuthentication;
     private final IRestaurantConnectionPort restaurantConnectionPort;
 
-    public UserUseCase(IUserPersistencePort userPersistencePort, IRolePersistencePort rolePersistencePort, PasswordEncoder passwordEncoder, IUserAuthentication userAuthentication, IRestaurantConnectionPort restaurantConnectionPort) {
+    public UserUseCase(IUserPersistencePort userPersistencePort, IRolePersistencePort rolePersistencePort, IPasswordEncoderPort passwordEncoderPort, IUserAuthentication userAuthentication, IRestaurantConnectionPort restaurantConnectionPort) {
         this.userPersistencePort = userPersistencePort;
         this.rolePersistencePort = rolePersistencePort;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordEncoderPort = passwordEncoderPort;
         this.userAuthentication = userAuthentication;
         this.restaurantConnectionPort = restaurantConnectionPort;
     }
@@ -38,7 +38,7 @@ public class UserUseCase implements IUserServicePort {
                 user.getCellPhoneNumber(),
                 user.getBirthDate(),
                 user.getEmail(),
-                passwordEncoder.encode(user.getPassword()),
+                passwordEncoderPort.encode(user.getPassword()),
                 role
         );
 
@@ -76,7 +76,7 @@ public class UserUseCase implements IUserServicePort {
                 user.getCellPhoneNumber(),
                 user.getBirthDate(),
                 user.getEmail(),
-                passwordEncoder.encode(user.getPassword()),
+                passwordEncoderPort.encode(user.getPassword()),
                 role
         );
 

@@ -2,11 +2,11 @@ package plazadecomidas.users.domain.primaryport.usecase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import plazadecomidas.users.TestData.DomainTestData;
 import plazadecomidas.users.domain.model.Role;
 import plazadecomidas.users.domain.model.Token;
 import plazadecomidas.users.domain.model.User;
+import plazadecomidas.users.domain.secondaryport.IPasswordEncoderPort;
 import plazadecomidas.users.domain.secondaryport.IRestaurantConnectionPort;
 import plazadecomidas.users.domain.secondaryport.IRolePersistencePort;
 import plazadecomidas.users.domain.secondaryport.IUserAuthentication;
@@ -29,7 +29,7 @@ class UserUseCaseTest {
 
     private IUserPersistencePort userPersistencePort;
     private IRolePersistencePort rolePersistencePort;
-    private PasswordEncoder passwordEncoder;
+    private IPasswordEncoderPort passwordEncoderPort;
     private IUserAuthentication userAuthentication;
     private IRestaurantConnectionPort restaurantConnectionPort;
 
@@ -37,10 +37,10 @@ class UserUseCaseTest {
     void setUp() {
         userPersistencePort = mock(IUserPersistencePort.class);
         rolePersistencePort = mock(IRolePersistencePort.class);
-        passwordEncoder = mock(PasswordEncoder.class);
+        passwordEncoderPort = mock(IPasswordEncoderPort.class);
         userAuthentication = mock(IUserAuthentication.class);
         restaurantConnectionPort = mock(IRestaurantConnectionPort.class);
-        userUseCase = new UserUseCase(userPersistencePort, rolePersistencePort, passwordEncoder, userAuthentication, restaurantConnectionPort);
+        userUseCase = new UserUseCase(userPersistencePort, rolePersistencePort, passwordEncoderPort, userAuthentication, restaurantConnectionPort);
     }
 
     @Test
@@ -51,13 +51,13 @@ class UserUseCaseTest {
         String tokenString = "token";
 
         when(rolePersistencePort.findById(anyLong())).thenReturn(role);
-        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(encodedPassword);
         when(userPersistencePort.saveUser(any(User.class))).thenReturn(user);
         when(userAuthentication.createToken(any(User.class))).thenReturn(tokenString);
 
         Token token = userUseCase.saveUser(user);
 
-        verify(passwordEncoder, times(1)).encode(anyString());
+        verify(passwordEncoderPort, times(1)).encode(anyString());
         verify(userPersistencePort, times(1)).saveUser(any(User.class));
         verify(rolePersistencePort, times(1)).findById(anyLong());
         verify(userAuthentication, times(1)).createToken(any(User.class));
@@ -98,13 +98,13 @@ class UserUseCaseTest {
         String tokenString = "token";
 
         when(rolePersistencePort.findById(anyLong())).thenReturn(role);
-        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
+        when(passwordEncoderPort.encode(anyString())).thenReturn(encodedPassword);
         when(userPersistencePort.saveUser(any(User.class))).thenReturn(user);
         when(userAuthentication.createToken(any(User.class))).thenReturn(tokenString);
 
         Token token = userUseCase.saveUserInBothServices(user, ownerToken, 1L, 1L);
 
-        verify(passwordEncoder, times(1)).encode(anyString());
+        verify(passwordEncoderPort, times(1)).encode(anyString());
         verify(userPersistencePort, times(1)).saveUser(any(User.class));
         verify(rolePersistencePort, times(1)).findById(anyLong());
         verify(userAuthentication, times(1)).createToken(any(User.class));

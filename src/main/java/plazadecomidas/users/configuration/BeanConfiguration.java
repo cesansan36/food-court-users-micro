@@ -9,6 +9,7 @@ import plazadecomidas.users.adapters.driven.authentication.userdetailsservice.Us
 import plazadecomidas.users.adapters.driven.connection.adapter.RestaurantConnectionAdapter;
 import plazadecomidas.users.adapters.driven.connection.feign.IEmployeeFeignClient;
 import plazadecomidas.users.adapters.driven.connection.mapper.IEmployeeRequestMapper;
+import plazadecomidas.users.adapters.driven.encoding.adapter.PasswordEncoderAdapter;
 import plazadecomidas.users.adapters.driven.jpa.mysql.adapter.RoleAdapter;
 import plazadecomidas.users.adapters.driven.jpa.mysql.adapter.UserAdapter;
 import plazadecomidas.users.adapters.driven.jpa.mysql.mapper.IRoleEntityMapper;
@@ -17,6 +18,7 @@ import plazadecomidas.users.adapters.driven.jpa.mysql.repository.IRoleRepository
 import plazadecomidas.users.adapters.driven.jpa.mysql.repository.IUserRepository;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
 import plazadecomidas.users.domain.primaryport.usecase.UserUseCase;
+import plazadecomidas.users.domain.secondaryport.IPasswordEncoderPort;
 import plazadecomidas.users.domain.secondaryport.IRestaurantConnectionPort;
 import plazadecomidas.users.domain.secondaryport.IRolePersistencePort;
 import plazadecomidas.users.domain.secondaryport.IUserAuthentication;
@@ -34,8 +36,13 @@ public class BeanConfiguration {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    public IUserServicePort userServicePort(IUserPersistencePort userPersistencePort, IUserAuthentication userAuthentication, IRolePersistencePort rolePersistencePort, IRestaurantConnectionPort restaurantConnectionPort) {
+    public IUserServicePort userServicePort(IUserPersistencePort userPersistencePort, IRolePersistencePort rolePersistencePort, IPasswordEncoderPort passwordEncoder, IUserAuthentication userAuthentication, IRestaurantConnectionPort restaurantConnectionPort) {
         return new UserUseCase(userPersistencePort, rolePersistencePort, passwordEncoder, userAuthentication, restaurantConnectionPort);
+    }
+
+    @Bean
+    public IPasswordEncoderPort passwordEncoderPort() {
+        return new PasswordEncoderAdapter(passwordEncoder);
     }
 
     @Bean
