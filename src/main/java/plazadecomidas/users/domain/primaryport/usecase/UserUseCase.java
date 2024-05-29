@@ -92,4 +92,9 @@ public class UserUseCase implements IUserServicePort {
     public String getUserPhone(Long id) {
         return userPersistencePort.getUserPhone(id);
     }
+
+    @Override
+    public String getUserEmail(Long id) {
+        return userPersistencePort.getUserEmail(id);
+    }
 }

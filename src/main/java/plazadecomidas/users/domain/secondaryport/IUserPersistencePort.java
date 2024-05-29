@@ -11,4 +11,6 @@ public interface IUserPersistencePort {
     User findByEmail(String email);
 
     String getUserPhone(Long id);
+
+    String getUserEmail(Long id);
 }

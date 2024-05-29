@@ -65,4 +65,15 @@ public class UserAdapter implements IUserPersistencePort {
 
         return phoneNumber.get();
     }
+
+    @Override
+    public String getUserEmail(Long id) {
+        Optional<String> email = userRepository.findEmailById(id);
+
+        if (email.isEmpty()) {
+            throw new RegistryNotFoundException(PersistenceConstants.USER_NOT_FOUND_MESSAGE);
+        }
+
+        return email.get();
+    }
 }

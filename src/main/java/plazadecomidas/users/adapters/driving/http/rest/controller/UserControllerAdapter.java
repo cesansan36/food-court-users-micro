@@ -18,6 +18,7 @@ import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddOwnerUserR
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.LogInRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.LogInResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserCreatedResponse;
+import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserEmailResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserPhoneResponse;
 import plazadecomidas.users.adapters.driving.http.rest.exception.RoleMismatchException;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IClientUserRequestMapper;
@@ -26,6 +27,7 @@ import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInRequestMappe
 import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserEmailResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserPhoneResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.util.ControllerAdapterConstants;
 import plazadecomidas.users.domain.primaryport.IUserServicePort;
@@ -42,6 +44,7 @@ public class UserControllerAdapter {
     private final IClientUserRequestMapper clientUserRequestMapper;
     private final IUserCreatedResponseMapper userCreatedResponseMapper;
     private final IUserPhoneResponseMapper userPhoneResponseMapper;
+    private final IUserEmailResponseMapper userEmailResponseMapper;
     private final ILogInRequestMapper logInRequestMapper;
     private final ILogInResponseMapper logInResponseMapper;
     private final ITokenUtils tokenUtils;
@@ -113,6 +116,19 @@ public class UserControllerAdapter {
                                         userServicePort.getUserPhone(id));
 
         return ResponseEntity.ok(response.phoneNumber());
+    }
+
+    @GetMapping("get-email")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CLIENT')")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<String> getEmail(@RequestHeader(value = "Authorization") String token) {
+
+        Long id = extractToken(token);
+
+        UserEmailResponse response = userEmailResponseMapper.toUserEmailResponse(
+                userServicePort.getUserEmail(id));
+
+        return ResponseEntity.ok(response.email());
     }
 
     private Long extractToken(String token) {

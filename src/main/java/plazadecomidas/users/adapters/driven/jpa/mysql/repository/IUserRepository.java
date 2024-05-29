@@ -15,4 +15,7 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("SELECT u.cellPhoneNumber FROM UserEntity u WHERE u.id = :userId")
     Optional<String> findCellPhoneNumberById(@Param("userId") Long userId);
+
+    @Query("SELECT u.email FROM UserEntity u WHERE u.id = :userId")
+    Optional<String> findEmailById(@Param("userId") Long id);
 }
