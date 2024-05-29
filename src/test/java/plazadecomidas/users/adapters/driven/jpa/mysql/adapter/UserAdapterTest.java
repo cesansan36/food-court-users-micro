@@ -178,4 +178,27 @@ class UserAdapterTest {
 
         assertThrows(RegistryNotFoundException.class, () -> userAdapter.getUserPhone(id));
     }
+
+    @Test
+    void getUserEmailSuccess() {
+        Long id = 1L;
+        String email = "xXn8z@example.com";
+
+        when(userRepository.findEmailById(id)).thenReturn(Optional.of(email));
+
+        String result = userAdapter.getUserEmail(id);
+
+        assertEquals(email, result);
+        verify(userRepository, times(1)).findEmailById(id);
+    }
+
+    @Test
+    void getUserEmailFailBecauseNotFound() {
+        Long id = 1L;
+
+        when(userRepository.findEmailById(id)).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> userAdapter.getUserEmail(id));
+        verify(userRepository, times(1)).findEmailById(id);
+    }
 }

@@ -124,4 +124,18 @@ class UserUseCaseTest {
         assertEquals(phone, result);
 
     }
+
+    @Test
+    void getUserEmail() {
+        Long id = 1L;
+        String email = "email@somemail.com";
+
+        when(userPersistencePort.getUserEmail(anyLong())).thenReturn(email);
+
+        String result = userUseCase.getUserEmail(id);
+
+        verify(userPersistencePort, times(1)).getUserEmail(anyLong());
+        assertEquals(email, result);
+
+    }
 }

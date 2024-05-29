@@ -6,8 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -21,6 +26,7 @@ import plazadecomidas.users.adapters.driving.http.rest.dto.request.AddOwnerUserR
 import plazadecomidas.users.adapters.driving.http.rest.dto.request.LogInRequest;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.LogInResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserCreatedResponse;
+import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserEmailResponse;
 import plazadecomidas.users.adapters.driving.http.rest.dto.response.UserPhoneResponse;
 import plazadecomidas.users.adapters.driving.http.rest.exception.RoleMismatchException;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IClientUserRequestMapper;
@@ -29,6 +35,7 @@ import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInRequestMappe
 import plazadecomidas.users.adapters.driving.http.rest.mapper.ILogInResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IOwnerUserRequestMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserCreatedResponseMapper;
+import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserEmailResponseMapper;
 import plazadecomidas.users.adapters.driving.http.rest.mapper.IUserPhoneResponseMapper;
 import plazadecomidas.users.configuration.exceptionhandler.ControllerAdvisor;
 import plazadecomidas.users.domain.model.Token;
@@ -52,36 +59,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(MockitoExtension.class)
 class UserControllerAdapterTest {
 
-    private UserControllerAdapter userControllerAdapter;
+    @InjectMocks private UserControllerAdapter userControllerAdapter;
 
-    private IUserServicePort userServicePort;
-    private IOwnerUserRequestMapper ownerUserRequestMapper;
-    private IEmployeeUserRequestMapper employeeUserRequestMapper;
-    private IClientUserRequestMapper clientUserRequestMapper;
-    private IUserCreatedResponseMapper userCreatedResponseMapper;
-    private IUserPhoneResponseMapper userPhoneResponseMapper;
-    private ILogInRequestMapper logInRequestMapper;
-    private ILogInResponseMapper logInResponseMapper;
-    private ITokenUtils tokenUtils;
+    @Mock private IUserServicePort userServicePort;
+    @Mock private IOwnerUserRequestMapper ownerUserRequestMapper;
+    @Mock private IEmployeeUserRequestMapper employeeUserRequestMapper;
+    @Mock private IClientUserRequestMapper clientUserRequestMapper;
+    @Mock private IUserCreatedResponseMapper userCreatedResponseMapper;
+    @Mock private IUserPhoneResponseMapper userPhoneResponseMapper;
+    @Mock private IUserEmailResponseMapper userEmailResponseMapper;
+    @Mock private ILogInRequestMapper logInRequestMapper;
+    @Mock private ILogInResponseMapper logInResponseMapper;
+    @Mock private ITokenUtils tokenUtils;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        userServicePort = mock(IUserServicePort.class);
-        ownerUserRequestMapper = mock(IOwnerUserRequestMapper.class);
-        employeeUserRequestMapper = mock(IEmployeeUserRequestMapper.class);
-        clientUserRequestMapper = mock(IClientUserRequestMapper.class);
-        userCreatedResponseMapper = mock(IUserCreatedResponseMapper.class);
-        userPhoneResponseMapper = mock(IUserPhoneResponseMapper.class);
-        logInRequestMapper = mock(ILogInRequestMapper.class);
-        logInResponseMapper = mock(ILogInResponseMapper.class);
-        tokenUtils = mock(ITokenUtils.class);
-
-        userControllerAdapter = new UserControllerAdapter(userServicePort, ownerUserRequestMapper, employeeUserRequestMapper, clientUserRequestMapper, userCreatedResponseMapper, userPhoneResponseMapper, logInRequestMapper, logInResponseMapper, tokenUtils);
-
         mockMvc = MockMvcBuilders.standaloneSetup(userControllerAdapter).setControllerAdvice(new ControllerAdvisor()).build();
     }
 
@@ -346,5 +343,33 @@ class UserControllerAdapterTest {
 
         verify(userServicePort, times(1)).getUserPhone(anyLong());
         verify(userPhoneResponseMapper, times(1)).toUserPhoneResponse(anyString());
+    }
+
+    @Test
+    void getEmail() throws Exception {
+        String bearerToken = "Bearer token";
+        String email = "somemail@example.com";
+        UserEmailResponse response = new UserEmailResponse(email);
+        Long id = 1L;
+
+        Claim claim = ControllerTestData.getIdClaim(id);
+
+        when(userServicePort.getUserEmail(anyLong())).thenReturn(email);
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
+        when(userEmailResponseMapper.toUserEmailResponse(anyString())).thenReturn(response);
+
+        MockHttpServletRequestBuilder request = get("/users/get-email")
+                                                .header(HttpHeaders.AUTHORIZATION, bearerToken);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(email));
+
+        verify(userServicePort, times(1)).getUserEmail(anyLong());
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
+        verify(userEmailResponseMapper, times(1)).toUserEmailResponse(anyString());
     }
 }
